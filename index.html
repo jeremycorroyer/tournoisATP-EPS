@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tournoi ATP Badminton - EPS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRvdXJub2kgQVRQIEJhZG1pbnRvbiIsCiAgInNob3J0X25hbWUiOiAiQVRQIEJhZCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBlNzRlOSIKfQ==">
+  <link rel="manifest" href="data:application/json;base64,ewogICAibmFtZSI6ICJUb3Vybm9pIEFUUCBCYWRtaW50b24iLAogICAic2hvcnRfbmFtZSI6ICJBVFAgQmFkIiwKICAgInN0YXJ0X3VybCI6ICIuIiwKICAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwZjE3MmEiLAogICAidGhlbWVfY29sb3IiOiAiIzBlNzRlOSIKfQ==">
   <style>
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -35,7 +35,7 @@
         🏆 Classement ATP
       </button>
       <button onclick="switchTab('eleves')" id="tab-eleves" class="flex-1 py-3 text-center font-medium text-slate-400">
-        👥 Élèves (30)
+        👥 Élèves
       </button>
       <button onclick="switchTab('historique')" id="tab-historique" class="flex-1 py-3 text-center font-medium text-slate-400">
         📜 Historique
@@ -48,8 +48,6 @@
 
     <!-- ONGLET 1: SAISIE DU MATCH -->
     <section id="sec-saisie" class="tab-content active space-y-6">
-      
-      <!-- Section Formulaire Saisie -->
       <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-lg space-y-4">
         <h2 class="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2">
           Organiser & Saisir un Match
@@ -151,18 +149,32 @@
       </div>
     </section>
 
-    <!-- ONGLET 3: GESTION DE LA CLASSE -->
+    <!-- ONGLET 3: GESTION DE LA CLASSE & IMPORT -->
     <section id="sec-eleves" class="tab-content space-y-4">
-      <div class="flex justify-between items-center">
-        <h2 class="text-lg font-semibold text-slate-200">Effectif de la classe</h2>
-        <div class="flex gap-2">
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+          <h2 class="text-lg font-semibold text-slate-200">Importer la liste de classe</h2>
           <button onclick="charger30ElevesParDefaut()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 text-xs rounded text-slate-200">
-            Générer 30 Élèves
-          </button>
-          <button onclick="ajouterEleve()" class="bg-sky-600 hover:bg-sky-500 px-3 py-1.5 text-xs rounded text-white font-medium">
-            + Ajouter Élève
+            Générer 30 Élèves par défaut
           </button>
         </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs text-slate-400">
+            Copiez-collez vos prénoms (ou nom + prénom) depuis Excel, Numbers ou un CSV (un par ligne ou séparés par des virgules/tabulations) :
+          </label>
+          <textarea id="input-import-eleves" rows="4" placeholder="Ex:&#10;Lucas Martin&#10;Chloé Bernard&#10;Thomas Leroy..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-sky-500"></textarea>
+          <button onclick="importerListeExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm px-4 py-2 rounded-lg transition">
+            📥 Importer et remplacer les élèves
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-2">
+        <h2 class="text-md font-semibold text-slate-200">Effectif actuel</h2>
+        <button onclick="ajouterEleve()" class="bg-sky-600 hover:bg-sky-500 px-3 py-1.5 text-xs rounded text-white font-medium">
+          + Ajouter un élève
+        </button>
       </div>
 
       <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
@@ -201,13 +213,11 @@
   </footer>
 
   <script>
-    // Structure de données de la classe
     let state = {
       eleves: [],
       historique: []
     };
 
-    // Chargement initial au démarrage
     window.onload = function() {
       const saved = localStorage.getItem('badminton_atp_data');
       if (saved) {
@@ -241,6 +251,52 @@
       saveState();
     }
 
+    // Fonction d'import direct depuis Excel / Numbers / CSV (copier-coller)
+    function importerListeExcel() {
+      const texte = document.getElementById('input-import-eleves').value.trim();
+      if (!texte) {
+        alert("Veuillez coller une liste de noms dans la zone de texte.");
+        return;
+      }
+
+      // Découpage par ligne ou par tabulation/virgule
+      let lignes = texte.split(/\r?\n/);
+      let nouveauxNoms = [];
+
+      lignes.forEach(ligne => {
+        // Gérer aussi si plusieurs colonnes collées depuis Excel (séparées par tabulations)
+        let parties = ligne.split(/\t|,|;/);
+        parties.forEach(p => {
+          let nomNet = p.trim();
+          if (nomNet.length > 0) {
+            nouveauxNoms.push(nomNet);
+          }
+        });
+      });
+
+      if (nouveauxNoms.length === 0) {
+        alert("Aucun nom valide détecté.");
+        return;
+      }
+
+      if (confirm(`Voulez-vous remplacer les élèves actuels par cette nouvelle liste de ${nouveauxNoms.length} élèves ? (Attention, cela remettra les scores à 1000 pts).`)) {
+        state.eleves = nouveauxNoms.map((nom, index) => ({
+          id: Date.now() + index,
+          nom: nom,
+          points: 1000,
+          joues: 0,
+          victoires: 0,
+          defaites: 0,
+          arbitrages: 0,
+          pap: false
+        }));
+        state.historique = [];
+        document.getElementById('input-import-eleves').value = '';
+        saveState();
+        alert(`Import réussi : ${nouveauxNoms.length} élèves enregistrés !`);
+      }
+    }
+
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('nav button').forEach(el => {
@@ -255,10 +311,8 @@
     }
 
     function render() {
-      // Mettre à jour stats
       document.getElementById('stats-summary').innerText = `${state.eleves.length} élèves • ${state.historique.length} matchs`;
 
-      // 1. Remplir sélecteurs de saisie
       const selectJ1 = document.getElementById('select-j1');
       const selectJ2 = document.getElementById('select-j2');
       const selectArb = document.getElementById('select-arbitre');
@@ -268,8 +322,6 @@
       const valArb = selectArb.value;
 
       let optionsHTML = '<option value="">-- Choisir --</option>';
-      
-      // Trier par nom pour les listes déroulantes
       const elevesTriesNom = [...state.eleves].sort((a, b) => a.nom.localeCompare(b.nom));
       
       elevesTriesNom.forEach(e => {
@@ -285,16 +337,14 @@
       selectJ2.value = valJ2;
       selectArb.value = valArb;
 
-      // 2. Remplir le Tableau de Classement ATP
+      // Tableau Classement
       const tbody = document.getElementById('table-classement');
       tbody.innerHTML = '';
-
       const elevesTriesPoints = [...state.eleves].sort((a, b) => b.points - a.points);
 
       elevesTriesPoints.forEach((e, index) => {
         const tr = document.createElement('tr');
         tr.className = index % 2 === 0 ? 'bg-slate-800/50' : 'bg-slate-800';
-
         tr.innerHTML = `
           <td class="p-3 text-center font-bold ${index < 3 ? 'text-amber-400' : 'text-slate-400'}">${index + 1}</td>
           <td class="p-3 font-medium text-slate-200">
@@ -307,7 +357,7 @@
         tbody.appendChild(tr);
       });
 
-      // 3. Remplir Gestion Élèves
+      // Gestion Élèves
       const gridEleves = document.getElementById('liste-eleves-grid');
       gridEleves.innerHTML = '';
 
@@ -324,12 +374,13 @@
               <input type="checkbox" ${e.pap ? 'checked' : ''} onchange="togglePAP(${e.id})" class="rounded text-amber-500 bg-slate-800 border-slate-700">
               <span>PAP</span>
             </label>
+            <button onclick="supprimerEleve(${e.id})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1">❌</button>
           </div>
         `;
         gridEleves.appendChild(card);
       });
 
-      // 4. Remplir Historique
+      // Historique
       const histoUl = document.getElementById('liste-historique');
       if (state.historique.length === 0) {
         histoUl.innerHTML = '<li class="text-slate-500 text-center py-4">Aucun match enregistré.</li>';
@@ -355,14 +406,11 @@
       actualiserEnjeuxLive();
     }
 
-    // Calcul de l'enjeu Elo/EPS avant la saisie
     function calculerEloGain(ptsA, ptsB) {
       const EA = 1 / (1 + Math.pow(10, (ptsB - ptsA) / 400));
-      const K = 50; // Facteur d'amplitude
-      
+      const K = 50;
       const gainA_si_Victoire = Math.max(5, Math.round(K * (1 - EA)));
       const perteA_si_Defaite = Math.min(-5, Math.round(K * (0 - EA)));
-
       return { gainA_si_Victoire, perteA_si_Defaite };
     }
 
@@ -376,7 +424,6 @@
 
       if (j1 && j2 && idJ1 !== idJ2) {
         box.classList.remove('hidden');
-
         document.getElementById('label-radio-j1').innerText = j1.nom;
         document.getElementById('label-radio-j2').innerText = j2.nom;
         document.getElementById('enjeu-j1-nom').innerText = j1.nom;
@@ -392,7 +439,6 @@
           <div class="text-emerald-400 font-semibold">Victoire : +${resJ1.gainA_si_Victoire} pts${tagPerfJ1}</div>
           <div class="text-rose-400 text-xs">Défaite : ${resJ1.perteA_si_Defaite} pts</div>
         `;
-
         document.getElementById('enjeu-j2-detail').innerHTML = `
           <div class="text-emerald-400 font-semibold">Victoire : +${resJ2.gainA_si_Victoire} pts${tagPerfJ2}</div>
           <div class="text-rose-400 text-xs">Défaite : ${resJ2.perteA_si_Defaite} pts</div>
@@ -416,17 +462,14 @@
         alert("Veuillez sélectionner le Joueur A, le Joueur B ET l'Arbitre.");
         return;
       }
-
       if (idJ1 === idJ2) {
         alert("Un élève ne peut pas jouer contre lui-même !");
         return;
       }
-
       if (idArb === idJ1 || idArb === idJ2) {
         alert("L'arbitre ne peut pas être l'un des deux joueurs !");
         return;
       }
-
       if (!radVainqueur) {
         alert("Veuillez indiquer le vainqueur du match.");
         return;
@@ -447,40 +490,32 @@
         vainqueurId = j1.id;
         diffJ1 = eloJ1.gainA_si_Victoire;
         diffJ2 = eloJ1.perteA_si_Defaite;
-
         j1.victoires++;
         j2.defaites++;
       } else {
         vainqueurId = j2.id;
         diffJ2 = eloJ2.gainA_si_Victoire;
         diffJ1 = eloJ2.perteA_si_Defaite;
-
         j2.victoires++;
         j1.defaites++;
       }
 
-      // Bonus PAP / PPRE (+20% sur les points gagnés)
       if (j1.pap && diffJ1 > 0) diffJ1 = Math.round(diffJ1 * 1.2);
       if (j2.pap && diffJ2 > 0) diffJ2 = Math.round(diffJ2 * 1.2);
 
-      // Bonus Fair-play
       if (bonusFairplay) {
         if (vainqueurId === j1.id) diffJ1 += 10;
         else diffJ2 += 10;
       }
 
-      // Application des points
       j1.points += diffJ1;
       j2.points += diffJ2;
-
       j1.joues++;
       j2.joues++;
 
-      // Points d'arbitrage (+5 pts)
       arb.arbitrages++;
       arb.points += 5;
 
-      // Historique
       state.historique.push({
         id: Date.now(),
         j1Id: j1.id, j1Nom: j1.nom, diffJ1,
@@ -489,7 +524,6 @@
         arbitreId: arb.id, arbitreNom: arb.nom
       });
 
-      // Reset formulaire
       document.querySelectorAll('input[name="vainqueur"]').forEach(r => r.checked = false);
       document.getElementById('check-fairplay').checked = false;
 
@@ -499,10 +533,8 @@
 
     function annulerDernierMatch() {
       if (state.historique.length === 0) return;
-
       if (confirm("Voulez-vous vraiment annuler le dernier match enregistré ?")) {
         const last = state.historique.pop();
-
         const j1 = state.eleves.find(e => e.id === last.j1Id);
         const j2 = state.eleves.find(e => e.id === last.j2Id);
         const arb = state.eleves.find(e => e.id === last.arbitreId);
@@ -521,7 +553,6 @@
           arb.arbitrages--;
           arb.points -= 5;
         }
-
         saveState();
       }
     }
@@ -555,6 +586,13 @@
           arbitrages: 0,
           pap: false
         });
+        saveState();
+      }
+    }
+
+    function supprimerEleve(id) {
+      if (confirm("Supprimer cet élève de la liste ?")) {
+        state.eleves = state.eleves.filter(e => e.id !== id);
         saveState();
       }
     }
