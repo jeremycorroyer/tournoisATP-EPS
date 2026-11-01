@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tournoi ATP Badminton - EPS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="manifest" href="data:application/json;base64,ewogICAibmFtZSI6ICJUb3Vybm9pIEFUUCBCYWRtaW50b24iLAogICAic2hvcnRfbmFtZSI6ICJBVFAgQmFkIiwKICAgInN0YXJ0X3VybCI6ICIuIiwKICAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwZjE3MmEiLAogICAidGhlbWVfY29sb3IiOiAiIzBlNzRlOSIKfQ==">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRvdXJub2kgQVRQIEJhZG1pbnRvbiIsCiAgInNob3J0X25hbWUiOiAiQVRQIEJhZCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBlNzRlOSIKfQ==">
   <style>
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -15,120 +15,130 @@
 
   <!-- Header -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
-    <div class="max-w-4xl mx-auto flex justify-between items-center">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
       <h1 class="text-xl font-bold text-sky-400 flex items-center gap-2">
-        <span>🏸</span> Tournoi ATP Badminton
+        <span>🏸</span> ATP Bad — Supervision EPS
       </h1>
       <div id="stats-summary" class="text-xs text-slate-400">
-        0 élèves • 0 matchs
+        0 élèves • 0 matchs en cours
       </div>
     </div>
   </header>
 
   <!-- Navigation -->
   <nav class="bg-slate-800/80 backdrop-blur border-b border-slate-700">
-    <div class="max-w-4xl mx-auto flex divide-x divide-slate-700 text-sm">
-      <button onclick="switchTab('saisie')" id="tab-saisie" class="flex-1 py-3 text-center font-medium text-sky-400 border-b-2 border-sky-400">
-        ⚡ Saisie & Enjeux
+    <div class="max-w-6xl mx-auto flex divide-x divide-slate-700 text-sm overflow-x-auto">
+      <button onclick="switchTab('prof')" id="tab-prof" class="flex-1 py-3 px-4 text-center font-bold text-sky-400 border-b-2 border-sky-400 whitespace-nowrap">
+        🎛️ Page PROF / Terrains
       </button>
-      <button onclick="switchTab('classement')" id="tab-classement" class="flex-1 py-3 text-center font-medium text-slate-400">
+      <button onclick="switchTab('challenges')" id="tab-challenges" class="flex-1 py-3 px-4 text-center font-medium text-slate-400 whitespace-nowrap">
+        📊 Suivi Challenges
+      </button>
+      <button onclick="switchTab('classement')" id="tab-classement" class="flex-1 py-3 px-4 text-center font-medium text-slate-400 whitespace-nowrap">
         🏆 Classement ATP
       </button>
-      <button onclick="switchTab('eleves')" id="tab-eleves" class="flex-1 py-3 text-center font-medium text-slate-400">
-        👥 Élèves
+      <button onclick="switchTab('eleves')" id="tab-eleves" class="flex-1 py-3 px-4 text-center font-medium text-slate-400 whitespace-nowrap">
+        👥 Élèves & Import
       </button>
-      <button onclick="switchTab('historique')" id="tab-historique" class="flex-1 py-3 text-center font-medium text-slate-400">
+      <button onclick="switchTab('historique')" id="tab-historique" class="flex-1 py-3 px-4 text-center font-medium text-slate-400 whitespace-nowrap">
         📜 Historique
       </button>
     </div>
   </nav>
 
   <!-- Contenu Principal -->
-  <main class="max-w-4xl mx-auto w-full p-4 flex-grow">
+  <main class="max-w-6xl mx-auto w-full p-4 flex-grow space-y-6">
 
-    <!-- ONGLET 1: SAISIE DU MATCH -->
-    <section id="sec-saisie" class="tab-content active space-y-6">
+    <!-- ONGLET 1: PAGE PROF / TERRAINS SIMULTANÉS -->
+    <section id="sec-prof" class="tab-content active space-y-6">
+      
+      <!-- Lancement d'un nouveau match -->
       <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-lg space-y-4">
-        <h2 class="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2">
-          Organiser & Saisir un Match
+        <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2 flex justify-between items-center">
+          <span>⚡ Lancer un Match (Format 10 points)</span>
+          <span class="text-xs text-slate-400 font-normal">Contrôle des occupations terrain</span>
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Joueur 1 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1">Joueur A (Favori / Releveur)</label>
-            <select id="select-j1" onchange="actualiserEnjeuxLive()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:ring-2 focus:ring-sky-500">
-              <option value="">-- Choisir Joueur A --</option>
+            <label class="block text-xs text-slate-400 mb-1">Terrain (1 à 12)</label>
+            <select id="lancer-terrain" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-100">
+              <!-- Dynamique 1 à 12 -->
             </select>
           </div>
-
-          <!-- Joueur 2 -->
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1">Joueur B (Challenger / Adversaire)</label>
-            <select id="select-j2" onchange="actualiserEnjeuxLive()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:ring-2 focus:ring-sky-500">
-              <option value="">-- Choisir Joueur B --</option>
+            <label class="block text-xs text-slate-400 mb-1">Joueur A</label>
+            <select id="lancer-j1" onchange="actualiserEnjeuxLancement()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-100">
+              <option value="">-- Choisir --</option>
             </select>
           </div>
-
-          <!-- Arbitre -->
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1">Arbitre (+5 pts ATP)</label>
-            <select id="select-arbitre" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:ring-2 focus:ring-sky-500">
-              <option value="">-- Choisir l'Arbitre --</option>
+            <label class="block text-xs text-slate-400 mb-1">Joueur B</label>
+            <select id="lancer-j2" onchange="actualiserEnjeuxLancement()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-100">
+              <option value="">-- Choisir --</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Arbitre (+5 pts)</label>
+            <select id="lancer-arb" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-100">
+              <option value="">-- Choisir --</option>
             </select>
           </div>
         </div>
 
-        <!-- Panneau d'Affichage Interactif des Enjeux Live -->
-        <div id="box-enjeux" class="hidden bg-slate-900/90 border border-sky-500/40 rounded-xl p-4 text-center space-y-3">
-          <div class="text-xs uppercase tracking-wider text-sky-400 font-semibold">⚡ Enjeu du Match Avant Reprise du Volant ⚡</div>
-          <div class="grid grid-cols-2 gap-4 divide-x divide-slate-800">
-            <div>
-              <div id="enjeu-j1-nom" class="font-bold text-slate-200">Joueur A</div>
-              <div id="enjeu-j1-detail" class="text-sm mt-1"></div>
-            </div>
-            <div>
-              <div id="enjeu-j2-nom" class="font-bold text-slate-200">Joueur B</div>
-              <div id="enjeu-j2-detail" class="text-sm mt-1"></div>
-            </div>
-          </div>
+        <!-- Previsu Enjeu -->
+        <div id="previsu-enjeu" class="hidden bg-slate-900/80 p-3 rounded-lg border border-sky-500/30 text-xs flex justify-around text-center">
+          <div><span id="prev-j1-nom" class="font-bold"></span> : Victoire <span id="prev-j1-v" class="text-emerald-400 font-bold"></span> / Défaite <span id="prev-j1-d" class="text-rose-400"></span></div>
+          <div><span id="prev-j2-nom" class="font-bold"></span> : Victoire <span id="prev-j2-v" class="text-emerald-400 font-bold"></span> / Défaite <span id="prev-j2-d" class="text-rose-400"></span></div>
         </div>
 
-        <!-- Résultat & Options -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-2">
-          <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1">Vainqueur du match</label>
-            <div class="flex gap-4">
-              <label class="flex items-center gap-2 bg-slate-900 px-4 py-2 rounded-lg border border-slate-700 cursor-pointer flex-1">
-                <input type="radio" name="vainqueur" value="j1" class="text-sky-500">
-                <span id="label-radio-j1" class="text-sm">Joueur A</span>
-              </label>
-              <label class="flex items-center gap-2 bg-slate-900 px-4 py-2 rounded-lg border border-slate-700 cursor-pointer flex-1">
-                <input type="radio" name="vainqueur" value="j2" class="text-sky-500">
-                <span id="label-radio-j2" class="text-sm">Joueur B</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
-              <input type="checkbox" id="check-fairplay" class="rounded bg-slate-900 border-slate-700 text-sky-500">
-              <span>Bonus Fair-play / Engagement (+10 pts)</span>
-            </label>
-          </div>
-        </div>
-
-        <button onclick="enregistrerMatch()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg shadow-md transition">
-          Valider le match et attribuer les points
+        <button onclick="lancerMatchSurTerrain()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-lg transition text-sm">
+          ▶️ Lancer le match sur le terrain
         </button>
+      </div>
+
+      <!-- Grille des 12 Terrains -->
+      <div>
+        <h3 class="text-md font-semibold text-slate-200 mb-3 flex items-center gap-2">
+          <span>🏟️</span> Supervision des Terrains en cours
+        </h3>
+        <div id="grille-terrains" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Injecté en JS -->
+        </div>
       </div>
     </section>
 
-    <!-- ONGLET 2: CLASSEMENT ATP -->
+    <!-- ONGLET 2: SUIVI COMPORTEMENTAL & CHALLENGES -->
+    <section id="sec-challenges" class="tab-content space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-lg font-semibold text-slate-200">Tableau de Bord des Prises de Risque</h2>
+        <span class="text-xs text-slate-400">Analyse de la prise d'initiative (Prise de défi)</span>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 text-xs uppercase border-b border-slate-700">
+            <tr>
+              <th class="p-3">Élève</th>
+              <th class="p-3 text-center">Pts ATP</th>
+              <th class="p-3 text-center">Matchs Joués</th>
+              <th class="p-3 text-center">Défis "Challenge/Perf" Tentés</th>
+              <th class="p-3 text-center">Victoires / Défaites</th>
+              <th class="p-3 text-center">Arbitrages Validés</th>
+            </tr>
+          </thead>
+          <tbody id="table-challenges" class="divide-y divide-slate-700">
+            <!-- Rempli en JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ONGLET 3: CLASSEMENT ATP -->
     <section id="sec-classement" class="tab-content space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="text-lg font-semibold text-slate-200">Classement Dynamique ATP</h2>
-        <span class="text-xs text-slate-400">Tous les élèves débutent à 1000 pts</span>
+        <span class="text-xs text-slate-400">Base 1000 pts</span>
       </div>
 
       <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
@@ -149,7 +159,7 @@
       </div>
     </section>
 
-    <!-- ONGLET 3: GESTION DE LA CLASSE & IMPORT -->
+    <!-- ONGLET 4: GESTION DE LA CLASSE & IMPORT -->
     <section id="sec-eleves" class="tab-content space-y-4">
       <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
         <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -161,33 +171,27 @@
 
         <div class="space-y-2">
           <label class="block text-xs text-slate-400">
-            Copiez-collez vos prénoms (ou nom + prénom) depuis Excel, Numbers ou un CSV (un par ligne ou séparés par des virgules/tabulations) :
+            Copiez-collez vos prénoms depuis Excel / Numbers / CSV :
           </label>
-          <textarea id="input-import-eleves" rows="4" placeholder="Ex:&#10;Lucas Martin&#10;Chloé Bernard&#10;Thomas Leroy..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-sky-500"></textarea>
+          <textarea id="input-import-eleves" rows="3" placeholder="Lucas&#10;Chloé&#10;Thomas..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-sky-500"></textarea>
           <button onclick="importerListeExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm px-4 py-2 rounded-lg transition">
-            📥 Importer et remplacer les élèves
+            📥 Importer la liste
           </button>
         </div>
       </div>
 
-      <div class="flex justify-between items-center pt-2">
-        <h2 class="text-md font-semibold text-slate-200">Effectif actuel</h2>
-        <button onclick="ajouterEleve()" class="bg-sky-600 hover:bg-sky-500 px-3 py-1.5 text-xs rounded text-white font-medium">
-          + Ajouter un élève
-        </button>
-      </div>
-
       <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-        <div id="liste-eleves-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <h3 class="text-sm font-semibold text-slate-300">Liste des élèves inscrits</h3>
+        <div id="liste-eleves-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <!-- Rempli en JS -->
         </div>
       </div>
     </section>
 
-    <!-- ONGLET 4: HISTORIQUE & EXPORT -->
+    <!-- ONGLET 5: HISTORIQUE -->
     <section id="sec-historique" class="tab-content space-y-4">
       <div class="flex justify-between items-center">
-        <h2 class="text-lg font-semibold text-slate-200">Historique des Rencontres</h2>
+        <h2 class="text-lg font-semibold text-slate-200">Historique des Matchs Validés</h2>
         <div class="flex gap-2">
           <button onclick="annulerDernierMatch()" class="bg-amber-600 hover:bg-amber-500 px-3 py-1.5 text-xs rounded text-white">
             ↩️ Annuler dernier match
@@ -200,28 +204,27 @@
 
       <div class="bg-slate-800 rounded-xl border border-slate-700 p-4">
         <ul id="liste-historique" class="space-y-2 text-sm text-slate-300">
-          <li class="text-slate-500 text-center py-4">Aucun match enregistré pour le moment.</li>
+          <li class="text-slate-500 text-center py-4">Aucun match enregistré.</li>
         </ul>
       </div>
     </section>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-slate-800 border-t border-slate-700 p-3 text-center text-xs text-slate-500">
-    EPS Badminton ATP System • PWA Offline Ready
-  </footer>
-
   <script>
     let state = {
       eleves: [],
+      terrains: Array(12).fill(null), // 12 terrains disponibles
       historique: []
     };
 
     window.onload = function() {
-      const saved = localStorage.getItem('badminton_atp_data');
+      const saved = localStorage.getItem('badminton_atp_prof_data');
       if (saved) {
         state = JSON.parse(saved);
+        if (!state.terrains || state.terrains.length !== 12) {
+          state.terrains = Array(12).fill(null);
+        }
       } else {
         charger30ElevesParDefaut();
       }
@@ -229,7 +232,7 @@
     };
 
     function saveState() {
-      localStorage.setItem('badminton_atp_data', JSON.stringify(state));
+      localStorage.setItem('badminton_atp_prof_data', JSON.stringify(state));
       render();
     }
 
@@ -244,166 +247,26 @@
           victoires: 0,
           defaites: 0,
           arbitrages: 0,
+          challengesTentes: 0,
           pap: false
         });
       }
+      state.terrains = Array(12).fill(null);
       state.historique = [];
       saveState();
-    }
-
-    // Fonction d'import direct depuis Excel / Numbers / CSV (copier-coller)
-    function importerListeExcel() {
-      const texte = document.getElementById('input-import-eleves').value.trim();
-      if (!texte) {
-        alert("Veuillez coller une liste de noms dans la zone de texte.");
-        return;
-      }
-
-      // Découpage par ligne ou par tabulation/virgule
-      let lignes = texte.split(/\r?\n/);
-      let nouveauxNoms = [];
-
-      lignes.forEach(ligne => {
-        // Gérer aussi si plusieurs colonnes collées depuis Excel (séparées par tabulations)
-        let parties = ligne.split(/\t|,|;/);
-        parties.forEach(p => {
-          let nomNet = p.trim();
-          if (nomNet.length > 0) {
-            nouveauxNoms.push(nomNet);
-          }
-        });
-      });
-
-      if (nouveauxNoms.length === 0) {
-        alert("Aucun nom valide détecté.");
-        return;
-      }
-
-      if (confirm(`Voulez-vous remplacer les élèves actuels par cette nouvelle liste de ${nouveauxNoms.length} élèves ? (Attention, cela remettra les scores à 1000 pts).`)) {
-        state.eleves = nouveauxNoms.map((nom, index) => ({
-          id: Date.now() + index,
-          nom: nom,
-          points: 1000,
-          joues: 0,
-          victoires: 0,
-          defaites: 0,
-          arbitrages: 0,
-          pap: false
-        }));
-        state.historique = [];
-        document.getElementById('input-import-eleves').value = '';
-        saveState();
-        alert(`Import réussi : ${nouveauxNoms.length} élèves enregistrés !`);
-      }
     }
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('nav button').forEach(el => {
-        el.classList.remove('text-sky-400', 'border-b-2', 'border-sky-400');
-        el.classList.add('text-slate-400');
+        el.classList.remove('text-sky-400', 'border-b-2', 'border-sky-400', 'font-bold');
+        el.classList.add('text-slate-400', 'font-medium');
       });
 
       document.getElementById(`sec-${tabId}`).classList.add('active');
       const btn = document.getElementById(`tab-${tabId}`);
-      btn.classList.remove('text-slate-400');
-      btn.classList.add('text-sky-400', 'border-b-2', 'border-sky-400');
-    }
-
-    function render() {
-      document.getElementById('stats-summary').innerText = `${state.eleves.length} élèves • ${state.historique.length} matchs`;
-
-      const selectJ1 = document.getElementById('select-j1');
-      const selectJ2 = document.getElementById('select-j2');
-      const selectArb = document.getElementById('select-arbitre');
-
-      const valJ1 = selectJ1.value;
-      const valJ2 = selectJ2.value;
-      const valArb = selectArb.value;
-
-      let optionsHTML = '<option value="">-- Choisir --</option>';
-      const elevesTriesNom = [...state.eleves].sort((a, b) => a.nom.localeCompare(b.nom));
-      
-      elevesTriesNom.forEach(e => {
-        const badge = e.pap ? ' (PAP)' : '';
-        optionsHTML += `<option value="${e.id}">${e.nom}${badge} - [${e.points} pts]</option>`;
-      });
-
-      selectJ1.innerHTML = optionsHTML;
-      selectJ2.innerHTML = optionsHTML;
-      selectArb.innerHTML = optionsHTML;
-
-      selectJ1.value = valJ1;
-      selectJ2.value = valJ2;
-      selectArb.value = valArb;
-
-      // Tableau Classement
-      const tbody = document.getElementById('table-classement');
-      tbody.innerHTML = '';
-      const elevesTriesPoints = [...state.eleves].sort((a, b) => b.points - a.points);
-
-      elevesTriesPoints.forEach((e, index) => {
-        const tr = document.createElement('tr');
-        tr.className = index % 2 === 0 ? 'bg-slate-800/50' : 'bg-slate-800';
-        tr.innerHTML = `
-          <td class="p-3 text-center font-bold ${index < 3 ? 'text-amber-400' : 'text-slate-400'}">${index + 1}</td>
-          <td class="p-3 font-medium text-slate-200">
-            ${e.nom} ${e.pap ? '<span class="bg-amber-500/20 text-amber-300 text-xs px-1.5 py-0.5 rounded border border-amber-500/30">PAP/PPRE</span>' : ''}
-          </td>
-          <td class="p-3 text-center font-bold text-sky-400">${e.points}</td>
-          <td class="p-3 text-center text-xs text-slate-400">${e.joues} / <span class="text-emerald-400">${e.victoires}</span> / <span class="text-rose-400">${e.defaites}</span></td>
-          <td class="p-3 text-center font-semibold text-slate-300">${e.arbitrages}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      // Gestion Élèves
-      const gridEleves = document.getElementById('liste-eleves-grid');
-      gridEleves.innerHTML = '';
-
-      state.eleves.forEach(e => {
-        const card = document.createElement('div');
-        card.className = 'bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center';
-        card.innerHTML = `
-          <div class="space-y-1">
-            <input type="text" value="${e.nom}" onchange="modifierNom(${e.id}, this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm text-slate-100 font-medium focus:ring-1 focus:ring-sky-500">
-            <div class="text-xs text-slate-400">${e.points} pts ATP • ${e.arbitrages} arbitrages</div>
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="flex items-center gap-1 text-xs text-amber-300 cursor-pointer">
-              <input type="checkbox" ${e.pap ? 'checked' : ''} onchange="togglePAP(${e.id})" class="rounded text-amber-500 bg-slate-800 border-slate-700">
-              <span>PAP</span>
-            </label>
-            <button onclick="supprimerEleve(${e.id})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1">❌</button>
-          </div>
-        `;
-        gridEleves.appendChild(card);
-      });
-
-      // Historique
-      const histoUl = document.getElementById('liste-historique');
-      if (state.historique.length === 0) {
-        histoUl.innerHTML = '<li class="text-slate-500 text-center py-4">Aucun match enregistré.</li>';
-      } else {
-        histoUl.innerHTML = '';
-        [...state.historique].reverse().forEach(h => {
-          const li = document.createElement('li');
-          li.className = 'bg-slate-900 p-3 rounded border border-slate-700 flex justify-between items-center text-xs';
-          li.innerHTML = `
-            <div>
-              <span class="font-bold ${h.vainqueurId === h.j1Id ? 'text-emerald-400' : 'text-slate-300'}">${h.j1Nom} (${h.diffJ1 >= 0 ? '+' : ''}${h.diffJ1})</span>
-              <span class="text-slate-500 px-2">vs</span>
-              <span class="font-bold ${h.vainqueurId === h.j2Id ? 'text-emerald-400' : 'text-slate-300'}">${h.j2Nom} (${h.diffJ2 >= 0 ? '+' : ''}${h.diffJ2})</span>
-            </div>
-            <div class="text-slate-400">
-              Arbitre : <span class="text-sky-300">${h.arbitreNom} (+5 pts)</span>
-            </div>
-          `;
-          histoUl.appendChild(li);
-        });
-      }
-
-      actualiserEnjeuxLive();
+      btn.classList.remove('text-slate-400', 'font-medium');
+      btn.classList.add('text-sky-400', 'border-b-2', 'border-sky-400', 'font-bold');
     }
 
     function calculerEloGain(ptsA, ptsB) {
@@ -414,64 +277,210 @@
       return { gainA_si_Victoire, perteA_si_Defaite };
     }
 
-    function actualiserEnjeuxLive() {
-      const idJ1 = parseInt(document.getElementById('select-j1').value);
-      const idJ2 = parseInt(document.getElementById('select-j2').value);
-      const box = document.getElementById('box-enjeux');
+    function estEleveOccupe(idEleve) {
+      return state.terrains.some(t => t !== null && (t.j1Id === idEleve || t.j2Id === idEleve || t.arbId === idEleve));
+    }
+
+    function render() {
+      const matchsEnCoursCount = state.terrains.filter(t => t !== null).length;
+      document.getElementById('stats-summary').innerText = `${state.eleves.length} élèves • ${matchsEnCoursCount} match(s) en cours`;
+
+      // 1. Remplir sélecteur terrains libres
+      const selectT = document.getElementById('lancer-terrain');
+      selectT.innerHTML = '';
+      state.terrains.forEach((t, index) => {
+        const num = index + 1;
+        const status = t ? '🔴 Occupé' : '🟢 Libre';
+        selectT.innerHTML += `<option value="${index}" ${t ? 'disabled' : ''}>Terrain ${num} (${status})</option>`;
+      });
+
+      // 2. Remplir sélecteurs élèves (exclure ceux qui jouent déjà)
+      const selJ1 = document.getElementById('lancer-j1');
+      const selJ2 = document.getElementById('lancer-j2');
+      const selArb = document.getElementById('lancer-arb');
+
+      const vJ1 = selJ1.value; const vJ2 = selJ2.value; const vArb = selArb.value;
+
+      let optionsHTML = '<option value="">-- Choisir --</option>';
+      const elevesTries = [...state.eleves].sort((a, b) => a.nom.localeCompare(b.nom));
+
+      elevesTries.forEach(e => {
+        const occupe = estEleveOccupe(e.id);
+        const labelOccupe = occupe ? ' (En Match/Arb)' : '';
+        optionsHTML += `<option value="${e.id}" ${occupe ? 'disabled' : ''}>${e.nom} [${e.points} pts]${labelOccupe}</option>`;
+      });
+
+      selJ1.innerHTML = optionsHTML; selJ2.innerHTML = optionsHTML; selArb.innerHTML = optionsHTML;
+      selJ1.value = vJ1; selJ2.value = vJ2; selArb.value = vArb;
+
+      // 3. Render Grille Terrains (12 Terrains PROF)
+      const grille = document.getElementById('grille-terrains');
+      grille.innerHTML = '';
+
+      state.terrains.forEach((t, idx) => {
+        const numT = idx + 1;
+        const card = document.createElement('div');
+
+        if (!t) {
+          card.className = "bg-slate-800/40 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between items-center text-slate-500 min-h-[160px]";
+          card.innerHTML = `
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Terrain ${numT}</div>
+            <div class="text-sm">🟢 Dispo</div>
+            <div></div>
+          `;
+        } else {
+          const res1 = calculerEloGain(t.j1Pts, t.j2Pts);
+          const res2 = calculerEloGain(t.j2Pts, t.j1Pts);
+
+          card.className = "bg-slate-800 border-2 border-sky-500/80 rounded-xl p-4 shadow-lg space-y-3";
+          card.innerHTML = `
+            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+              <span class="font-bold text-sky-400 text-xs uppercase">Terrain ${numT} • EN COURS</span>
+              <button onclick="annulerMatchTerrain(${idx})" class="text-xs text-rose-400 hover:text-rose-300">Annuler</button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-900 p-2 rounded border border-slate-700">
+                <div class="font-bold text-slate-200 text-sm truncate">${t.j1Nom}</div>
+                <div class="text-emerald-400 font-medium">Victoire: +${res1.gainA_si_Victoire}</div>
+                <div class="text-rose-400">Défaite: ${res1.perteA_si_Defaite}</div>
+              </div>
+              <div class="bg-slate-900 p-2 rounded border border-slate-700">
+                <div class="font-bold text-slate-200 text-sm truncate">${t.j2Nom}</div>
+                <div class="text-emerald-400 font-medium">Victoire: +${res2.gainA_si_Victoire}</div>
+                <div class="text-rose-400">Défaite: ${res2.perteA_si_Defaite}</div>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-400 text-center">
+              Arbitre : <span class="text-sky-300 font-semibold">${t.arbNom}</span>
+            </div>
+
+            <!-- Validation du score (10 pts) -->
+            <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-700 space-y-2">
+              <div class="text-xs text-center font-medium text-slate-300">Saisir le score final (1er à 10)</div>
+              <div class="flex items-center gap-2">
+                <input type="number" id="score-j1-${idx}" placeholder="${t.j1Nom}" class="w-1/2 bg-slate-800 border border-slate-700 rounded p-1 text-center text-sm font-bold text-slate-100">
+                <span class="text-slate-500 font-bold">-</span>
+                <input type="number" id="score-j2-${idx}" placeholder="${t.j2Nom}" class="w-1/2 bg-slate-800 border border-slate-700 rounded p-1 text-center text-sm font-bold text-slate-100">
+              </div>
+              <button onclick="validerScoreTerrain(${idx})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 rounded text-xs">
+                ✅ Valider le Match
+              </button>
+            </div>
+          `;
+        }
+        grille.appendChild(card);
+      });
+
+      // 4. Render Suivi Challenges
+      const tbodyC = document.getElementById('table-challenges');
+      tbodyC.innerHTML = '';
+      [...state.eleves].sort((a, b) => b.challengesTentes - a.challengesTentes).forEach(e => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-700/50';
+        tr.innerHTML = `
+          <td class="p-3 font-medium text-slate-200">${e.nom}</td>
+          <td class="p-3 text-center font-bold text-sky-400">${e.points}</td>
+          <td class="p-3 text-center">${e.joues}</td>
+          <td class="p-3 text-center font-bold ${e.challengesTentes > 0 ? 'text-amber-400' : 'text-slate-500'}">${e.challengesTentes} 🚀</td>
+          <td class="p-3 text-center text-xs">${e.victoires}V / ${e.defaites}D</td>
+          <td class="p-3 text-center text-sky-300 font-semibold">${e.arbitrages}</td>
+        `;
+        tbodyC.appendChild(tr);
+      });
+
+      // 5. Render Classement ATP
+      const tbodyATP = document.getElementById('table-classement');
+      tbodyATP.innerHTML = '';
+      [...state.eleves].sort((a, b) => b.points - a.points).forEach((e, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = idx % 2 === 0 ? 'bg-slate-800/50' : 'bg-slate-800';
+        tr.innerHTML = `
+          <td class="p-3 text-center font-bold ${idx < 3 ? 'text-amber-400' : 'text-slate-400'}">${idx + 1}</td>
+          <td class="p-3 font-medium text-slate-200">${e.nom} ${e.pap ? '<span class="text-amber-300 text-xs px-1 bg-amber-500/20 rounded">PAP</span>' : ''}</td>
+          <td class="p-3 text-center font-bold text-sky-400">${e.points}</td>
+          <td class="p-3 text-center text-xs text-slate-400">${e.joues} / <span class="text-emerald-400">${e.victoires}</span> / <span class="text-rose-400">${e.defaites}</span></td>
+          <td class="p-3 text-center font-semibold text-slate-300">${e.arbitrages}</td>
+        `;
+        tbodyATP.appendChild(tr);
+      });
+
+      // 6. Render Gestion élèves
+      const gridE = document.getElementById('liste-eleves-grid');
+      gridE.innerHTML = '';
+      state.eleves.forEach(e => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 p-2.5 rounded-lg border border-slate-700 flex justify-between items-center text-xs';
+        card.innerHTML = `
+          <input type="text" value="${e.nom}" onchange="modifierNom(${e.id}, this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-slate-100 font-medium w-2/3">
+          <label class="flex items-center gap-1 text-amber-300 cursor-pointer">
+            <input type="checkbox" ${e.pap ? 'checked' : ''} onchange="togglePAP(${e.id})" class="rounded text-amber-500">
+            <span>PAP</span>
+          </label>
+        `;
+        gridE.appendChild(card);
+      });
+
+      // 7. Render Historique
+      const ulH = document.getElementById('liste-historique');
+      if (state.historique.length === 0) {
+        ulH.innerHTML = '<li class="text-slate-500 text-center py-4">Aucun match enregistré.</li>';
+      } else {
+        ulH.innerHTML = '';
+        [...state.historique].reverse().forEach(h => {
+          const li = document.createElement('li');
+          li.className = 'bg-slate-900 p-3 rounded border border-slate-700 flex justify-between items-center text-xs';
+          li.innerHTML = `
+            <div>
+              <span class="font-bold ${h.scoreJ1 > h.scoreJ2 ? 'text-emerald-400' : 'text-slate-300'}">${h.j1Nom} (${h.scoreJ1}) [${h.diffJ1 >= 0 ? '+' : ''}${h.diffJ1}]</span>
+              <span class="text-slate-500 px-2">vs</span>
+              <span class="font-bold ${h.scoreJ2 > h.scoreJ1 ? 'text-emerald-400' : 'text-slate-300'}">${h.j2Nom} (${h.scoreJ2}) [${h.diffJ2 >= 0 ? '+' : ''}${h.diffJ2}]</span>
+            </div>
+            <div class="text-slate-400">Arbitre : <span class="text-sky-300">${h.arbNom} (+5)</span></div>
+          `;
+          ulH.appendChild(li);
+        });
+      }
+    }
+
+    function actualiserEnjeuxLancement() {
+      const idJ1 = parseInt(document.getElementById('lancer-j1').value);
+      const idJ2 = parseInt(document.getElementById('lancer-j2').value);
+      const prev = document.getElementById('previsu-enjeu');
 
       const j1 = state.eleves.find(e => e.id === idJ1);
       const j2 = state.eleves.find(e => e.id === idJ2);
 
       if (j1 && j2 && idJ1 !== idJ2) {
-        box.classList.remove('hidden');
-        document.getElementById('label-radio-j1').innerText = j1.nom;
-        document.getElementById('label-radio-j2').innerText = j2.nom;
-        document.getElementById('enjeu-j1-nom').innerText = j1.nom;
-        document.getElementById('enjeu-j2-nom').innerText = j2.nom;
+        prev.classList.remove('hidden');
+        const res1 = calculerEloGain(j1.points, j2.points);
+        const res2 = calculerEloGain(j2.points, j1.points);
 
-        const resJ1 = calculerEloGain(j1.points, j2.points);
-        const resJ2 = calculerEloGain(j2.points, j1.points);
+        document.getElementById('prev-j1-nom').innerText = j1.nom;
+        document.getElementById('prev-j1-v').innerText = `+${res1.gainA_si_Victoire} pts`;
+        document.getElementById('prev-j1-d').innerText = `${res1.perteA_si_Defaite} pts`;
 
-        let tagPerfJ1 = resJ1.gainA_si_Victoire >= 35 ? ' 🚀 (PERF !)' : '';
-        let tagPerfJ2 = resJ2.gainA_si_Victoire >= 35 ? ' 🚀 (PERF !)' : '';
-
-        document.getElementById('enjeu-j1-detail').innerHTML = `
-          <div class="text-emerald-400 font-semibold">Victoire : +${resJ1.gainA_si_Victoire} pts${tagPerfJ1}</div>
-          <div class="text-rose-400 text-xs">Défaite : ${resJ1.perteA_si_Defaite} pts</div>
-        `;
-        document.getElementById('enjeu-j2-detail').innerHTML = `
-          <div class="text-emerald-400 font-semibold">Victoire : +${resJ2.gainA_si_Victoire} pts${tagPerfJ2}</div>
-          <div class="text-rose-400 text-xs">Défaite : ${resJ2.perteA_si_Defaite} pts</div>
-        `;
+        document.getElementById('prev-j2-nom').innerText = j2.nom;
+        document.getElementById('prev-j2-v').innerText = `+${res2.gainA_si_Victoire} pts`;
+        document.getElementById('prev-j2-d').innerText = `${res2.perteA_si_Defaite} pts`;
       } else {
-        box.classList.add('hidden');
-        document.getElementById('label-radio-j1').innerText = "Joueur A";
-        document.getElementById('label-radio-j2').innerText = "Joueur B";
+        prev.classList.add('hidden');
       }
     }
 
-    function enregistrerMatch() {
-      const idJ1 = parseInt(document.getElementById('select-j1').value);
-      const idJ2 = parseInt(document.getElementById('select-j2').value);
-      const idArb = parseInt(document.getElementById('select-arbitre').value);
+    function lancerMatchSurTerrain() {
+      const idxT = parseInt(document.getElementById('lancer-terrain').value);
+      const idJ1 = parseInt(document.getElementById('lancer-j1').value);
+      const idJ2 = parseInt(document.getElementById('lancer-j2').value);
+      const idArb = parseInt(document.getElementById('lancer-arb').value);
 
-      const radVainqueur = document.querySelector('input[name="vainqueur"]:checked');
-      const bonusFairplay = document.getElementById('check-fairplay').checked;
-
-      if (!idJ1 || !idJ2 || !idArb) {
-        alert("Veuillez sélectionner le Joueur A, le Joueur B ET l'Arbitre.");
+      if (isNaN(idxT) || !idJ1 || !idJ2 || !idArb) {
+        alert("Sélectionnez le terrain, les 2 joueurs et l'arbitre.");
         return;
       }
-      if (idJ1 === idJ2) {
-        alert("Un élève ne peut pas jouer contre lui-même !");
-        return;
-      }
-      if (idArb === idJ1 || idArb === idJ2) {
-        alert("L'arbitre ne peut pas être l'un des deux joueurs !");
-        return;
-      }
-      if (!radVainqueur) {
-        alert("Veuillez indiquer le vainqueur du match.");
+      if (idJ1 === idJ2 || idArb === idJ1 || idArb === idJ2) {
+        alert("Les 3 rôles doivent être attribués à des élèves différents.");
         return;
       }
 
@@ -479,132 +488,157 @@
       const j2 = state.eleves.find(e => e.id === idJ2);
       const arb = state.eleves.find(e => e.id === idArb);
 
-      const eloJ1 = calculerEloGain(j1.points, j2.points);
-      const eloJ2 = calculerEloGain(j2.points, j1.points);
+      state.terrains[idxT] = {
+        j1Id: j1.id, j1Nom: j1.nom, j1Pts: j1.points,
+        j2Id: j2.id, j2Nom: j2.nom, j2Pts: j2.points,
+        arbId: arb.id, arbNom: arb.nom
+      };
 
-      let diffJ1 = 0;
-      let diffJ2 = 0;
-      let vainqueurId = 0;
+      // Compter s'il s'agit d'un défi (écart > 80 pts pour le moins bien classé)
+      if (j1.points <= j2.points - 80) j1.challengesTentes++;
+      if (j2.points <= j1.points - 80) j2.challengesTentes++;
 
-      if (radVainqueur.value === 'j1') {
-        vainqueurId = j1.id;
-        diffJ1 = eloJ1.gainA_si_Victoire;
-        diffJ2 = eloJ1.perteA_si_Defaite;
-        j1.victoires++;
-        j2.defaites++;
+      document.getElementById('lancer-j1').value = '';
+      document.getElementById('lancer-j2').value = '';
+      document.getElementById('lancer-arb').value = '';
+
+      saveState();
+    }
+
+    function validerScoreTerrain(idxTerrain) {
+      const t = state.terrains[idxTerrain];
+      if (!t) return;
+
+      const score1 = parseInt(document.getElementById(`score-j1-${idxTerrain}`).value);
+      const score2 = parseInt(document.getElementById(`score-j2-${idxTerrain}`).value);
+
+      if (isNaN(score1) || isNaN(score2)) {
+        alert("Veuillez entrer le score pour les deux joueurs (ex: 10 - 8).");
+        return;
+      }
+
+      if (score1 === score2) {
+        alert("Pas de match nul possible au badminton (format 10 points).");
+        return;
+      }
+
+      const j1 = state.eleves.find(e => e.id === t.j1Id);
+      const j2 = state.eleves.find(e => e.id === t.j2Id);
+      const arb = state.eleves.find(e => e.id === t.arbId);
+
+      const elo1 = calculerEloGain(j1.points, j2.points);
+      const elo2 = calculerEloGain(j2.points, j1.points);
+
+      let diffJ1 = 0; let diffJ2 = 0;
+
+      if (score1 > score2) {
+        diffJ1 = elo1.gainA_si_Victoire;
+        diffJ2 = elo1.perteA_si_Defaite;
+        j1.victoires++; j2.defaites++;
       } else {
-        vainqueurId = j2.id;
-        diffJ2 = eloJ2.gainA_si_Victoire;
-        diffJ1 = eloJ2.perteA_si_Defaite;
-        j2.victoires++;
-        j1.defaites++;
+        diffJ2 = elo2.gainA_si_Victoire;
+        diffJ1 = elo2.perteA_si_Defaite;
+        j2.victoires++; j1.defaites++;
       }
 
       if (j1.pap && diffJ1 > 0) diffJ1 = Math.round(diffJ1 * 1.2);
       if (j2.pap && diffJ2 > 0) diffJ2 = Math.round(diffJ2 * 1.2);
 
-      if (bonusFairplay) {
-        if (vainqueurId === j1.id) diffJ1 += 10;
-        else diffJ2 += 10;
-      }
-
       j1.points += diffJ1;
       j2.points += diffJ2;
-      j1.joues++;
-      j2.joues++;
+      j1.joues++; j2.joues++;
 
       arb.arbitrages++;
       arb.points += 5;
 
       state.historique.push({
         id: Date.now(),
-        j1Id: j1.id, j1Nom: j1.nom, diffJ1,
-        j2Id: j2.id, j2Nom: j2.nom, diffJ2,
-        vainqueurId,
-        arbitreId: arb.id, arbitreNom: arb.nom
+        j1Nom: j1.nom, j1Id: j1.id, scoreJ1: score1, diffJ1,
+        j2Nom: j2.nom, j2Id: j2.id, scoreJ2: score2, diffJ2,
+        arbNom: arb.nom, arbId: arb.id
       });
 
-      document.querySelectorAll('input[name="vainqueur"]').forEach(r => r.checked = false);
-      document.getElementById('check-fairplay').checked = false;
-
+      // Libérer le terrain
+      state.terrains[idxTerrain] = null;
       saveState();
-      alert(`Match enregistré avec succès !\n${j1.nom} : ${diffJ1 >= 0 ? '+' : ''}${diffJ1} pts\n${j2.nom} : ${diffJ2 >= 0 ? '+' : ''}${diffJ2} pts\nArbitre (${arb.nom}) : +5 pts`);
     }
 
-    function annulerDernierMatch() {
-      if (state.historique.length === 0) return;
-      if (confirm("Voulez-vous vraiment annuler le dernier match enregistré ?")) {
-        const last = state.historique.pop();
-        const j1 = state.eleves.find(e => e.id === last.j1Id);
-        const j2 = state.eleves.find(e => e.id === last.j2Id);
-        const arb = state.eleves.find(e => e.id === last.arbitreId);
-
-        if (j1) {
-          j1.points -= last.diffJ1;
-          j1.joues--;
-          if (last.vainqueurId === j1.id) j1.victoires--; else j1.defaites--;
-        }
-        if (j2) {
-          j2.points -= last.diffJ2;
-          j2.joues--;
-          if (last.vainqueurId === j2.id) j2.victoires--; else j2.defaites--;
-        }
-        if (arb) {
-          arb.arbitrages--;
-          arb.points -= 5;
-        }
+    function annulerMatchTerrain(idxTerrain) {
+      if (confirm("Annuler le match en cours sur ce terrain sans enregistrer les scores ?")) {
+        state.terrains[idxTerrain] = null;
         saveState();
       }
     }
 
-    function modifierNom(id, newNom) {
-      const e = state.eleves.find(el => el.id === id);
-      if (e) {
-        e.nom = newNom;
-        saveState();
-      }
-    }
+    function importerListeExcel() {
+      const texte = document.getElementById('input-import-eleves').value.trim();
+      if (!texte) return;
+      let lignes = texte.split(/\r?\n/);
+      let nouveauxNoms = [];
 
-    function togglePAP(id) {
-      const e = state.eleves.find(el => el.id === id);
-      if (e) {
-        e.pap = !e.pap;
-        saveState();
-      }
-    }
+      lignes.forEach(l => {
+        l.split(/\t|,|;/).forEach(p => {
+          let n = p.trim();
+          if (n.length > 0) nouveauxNoms.push(n);
+        });
+      });
 
-    function ajouterEleve() {
-      const nom = prompt("Nom du nouvel élève :");
-      if (nom) {
-        state.eleves.push({
-          id: Date.now(),
+      if (confirm(`Remplacer par les ${nouveauxNoms.length} nouveaux élèves ?`)) {
+        state.eleves = nouveauxNoms.map((nom, idx) => ({
+          id: Date.now() + idx,
           nom,
           points: 1000,
           joues: 0,
           victoires: 0,
           defaites: 0,
           arbitrages: 0,
+          challengesTentes: 0,
           pap: false
-        });
+        }));
+        state.terrains = Array(12).fill(null);
+        state.historique = [];
         saveState();
       }
     }
 
-    function supprimerEleve(id) {
-      if (confirm("Supprimer cet élève de la liste ?")) {
-        state.eleves = state.eleves.filter(e => e.id !== id);
+    function modifierNom(id, newNom) {
+      const e = state.eleves.find(el => el.id === id);
+      if (e) { e.nom = newNom; saveState(); }
+    }
+
+    function togglePAP(id) {
+      const e = state.eleves.find(el => el.id === id);
+      if (e) { e.pap = !e.pap; saveState(); }
+    }
+
+    function annulerDernierMatch() {
+      if (state.historique.length === 0) return;
+      if (confirm("Annuler le dernier match de l'historique ?")) {
+        const last = state.historique.pop();
+        const j1 = state.eleves.find(e => e.id === last.j1Id);
+        const j2 = state.eleves.find(e => e.id === last.j2Id);
+        const arb = state.eleves.find(e => e.id === last.arbId);
+
+        if (j1) {
+          j1.points -= last.diffJ1; j1.joues--;
+          if (last.scoreJ1 > last.scoreJ2) j1.victoires--; else j1.defaites--;
+        }
+        if (j2) {
+          j2.points -= last.diffJ2; j2.joues--;
+          if (last.scoreJ2 > last.scoreJ1) j2.victoires--; else j2.defaites--;
+        }
+        if (arb) { arb.arbitrages--; arb.points -= 5; }
         saveState();
       }
     }
 
     function exporterDonnees() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `badminton_atp_export.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      const a = document.createElement('a');
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", `badminton_prof_export.json`);
+      document.body.appendChild(a);
+      a.click(); a.remove();
     }
   </script>
 </body>
