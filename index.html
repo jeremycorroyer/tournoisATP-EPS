@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tournoi ATP Badminton - EPS</title>
+  <title>Tournoi ATP EPS - Multi-Séquences</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRvdXJub2kgQVRQIEJhZG1pbnRvbiIsCiAgInNob3J0X25hbWUiOiAiQVRQIEJhZCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBlNzRlOSIKfQ==">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRvdXJub2kgQVRQIEVQUyIsCiAgInNob3J0X25hbWUiOiAiQVRQIEVQUyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBlNzRlOSIKfQ==">
   <style>
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -13,14 +13,21 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
 
-  <!-- Header -->
+  <!-- Header & Gestion des Séquences -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
       <h1 class="text-xl font-bold text-sky-400 flex items-center gap-2">
-        <span>🏸</span> ATP Bad — Supervision EPS
+        <span>🏆</span> ATP EPS — <span id="titre-sequence-actif" class="text-white">Chargement...</span>
       </h1>
-      <div id="stats-summary" class="text-xs text-slate-400">
-        0 élèves • 0 matchs en cours
+      
+      <!-- Sélecteur de Séquence / Classe -->
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <select id="select-sequence" onchange="changerSequence(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-sky-300 font-semibold focus:ring-2 focus:ring-sky-500">
+          <!-- Dynamique -->
+        </select>
+        <button onclick="creerNouvelleSequence()" class="bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1.5 text-xs rounded-lg transition whitespace-nowrap">
+          ➕ Nouvelle Séquence
+        </button>
       </div>
     </div>
   </header>
@@ -41,7 +48,7 @@
         👥 Élèves & Import
       </button>
       <button onclick="switchTab('historique')" id="tab-historique" class="flex-1 py-3 px-4 text-center font-medium text-slate-400 whitespace-nowrap">
-        📜 Historique
+        📜 Historique & Arbitrage
       </button>
     </div>
   </nav>
@@ -51,12 +58,10 @@
 
     <!-- ONGLET 1: PAGE PROF / TERRAINS SIMULTANÉS -->
     <section id="sec-prof" class="tab-content active space-y-6">
-      
-      <!-- Lancement d'un nouveau match -->
       <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-lg space-y-4">
         <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2 flex justify-between items-center">
           <span>⚡ Lancer un Match (Format 10 points)</span>
-          <span class="text-xs text-slate-400 font-normal">Contrôle des occupations terrain</span>
+          <span id="stats-summary" class="text-xs text-slate-400 font-normal">0 élèves • 0 match en cours</span>
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -80,7 +85,7 @@
           </div>
           <div>
             <label class="block text-xs text-slate-400 mb-1">Arbitre (+5 pts)</label>
-            <select id="lancer-arb" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-100">
+            <select id="lancer-arb" onchange="actualiserEnjeuxLancement()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-100">
               <option value="">-- Choisir --</option>
             </select>
           </div>
@@ -163,7 +168,7 @@
     <section id="sec-eleves" class="tab-content space-y-4">
       <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
         <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-          <h2 class="text-lg font-semibold text-slate-200">Importer la liste de classe</h2>
+          <h2 class="text-lg font-semibold text-slate-200">Importer la liste de classe pour cette séquence</h2>
           <button onclick="charger30ElevesParDefaut()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 text-xs rounded text-slate-200">
             Générer 30 Élèves par défaut
           </button>
@@ -181,7 +186,17 @@
       </div>
 
       <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-        <h3 class="text-sm font-semibold text-slate-300">Liste des élèves inscrits</h3>
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-semibold text-slate-300">Liste des élèves inscrits (cette séquence)</h3>
+          <div class="flex gap-2">
+            <button onclick="resetStatsSequence()" class="bg-amber-600/80 hover:bg-amber-500 text-white px-3 py-1 text-xs rounded transition">
+              🔄 Remettre les scores à 1000 pts
+            </button>
+            <button onclick="supprimerSequenceActuelle()" class="bg-rose-600/80 hover:bg-rose-500 text-white px-3 py-1 text-xs rounded transition">
+              🗑️ Supprimer la séquence
+            </button>
+          </div>
+        </div>
         <div id="liste-eleves-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <!-- Rempli en JS -->
         </div>
@@ -191,18 +206,14 @@
     <!-- ONGLET 5: HISTORIQUE -->
     <section id="sec-historique" class="tab-content space-y-4">
       <div class="flex justify-between items-center">
-        <h2 class="text-lg font-semibold text-slate-200">Historique des Matchs Validés</h2>
-        <div class="flex gap-2">
-          <button onclick="annulerDernierMatch()" class="bg-amber-600 hover:bg-amber-500 px-3 py-1.5 text-xs rounded text-white">
-            ↩️ Annuler dernier match
-          </button>
-          <button onclick="exporterDonnees()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 text-xs rounded text-slate-200">
-            💾 Exporter (JSON)
-          </button>
-        </div>
+        <h2 class="text-lg font-semibold text-slate-200">Historique & Correction des Matchs</h2>
+        <button onclick="exporterDonnees()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 text-xs rounded text-slate-200">
+          💾 Exporter (JSON)
+        </button>
       </div>
 
-      <div class="bg-slate-800 rounded-xl border border-slate-700 p-4">
+      <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 space-y-3">
+        <p class="text-xs text-amber-400">💡 En cas d'erreur de score ou d'information rapportée a posteriori par un arbitre, vous pouvez supprimer un match ciblé ci-dessous : les points Elo et les statistiques de chaque élève seront automatiquement recalculés.</p>
         <ul id="liste-historique" class="space-y-2 text-sm text-slate-300">
           <li class="text-slate-500 text-center py-4">Aucun match enregistré.</li>
         </ul>
@@ -212,35 +223,52 @@
   </main>
 
   <script>
-    let state = {
-      eleves: [],
-      terrains: Array(12).fill(null), // 12 terrains disponibles
-      historique: []
+    // Structure multi-séquences / classes
+    let db = {
+      sequenceActiveId: null,
+      sequences: []
     };
 
     window.onload = function() {
-      const saved = localStorage.getItem('badminton_atp_prof_data');
+      const saved = localStorage.getItem('badminton_atp_multiseq_data');
       if (saved) {
-        state = JSON.parse(saved);
-        if (!state.terrains || state.terrains.length !== 12) {
-          state.terrains = Array(12).fill(null);
-        }
-      } else {
-        charger30ElevesParDefaut();
+        db = JSON.parse(saved);
       }
+      
+      // Si aucune séquence n'existe, on en crée une par défaut (ex: Badminton 4ème)
+      if (!db.sequences || db.sequences.length === 0) {
+        const idSeqDef = 'seq_' + Date.now();
+        db.sequences = [{
+          id: idSeqDef,
+          nom: 'Badminton - 4ème',
+          eleves: [],
+          terrains: Array(12).fill(null),
+          historique: []
+        }];
+        db.sequenceActiveId = idSeqDef;
+        generer30Eleves(db.sequences[0]);
+        saveDB();
+      } else if (!db.sequenceActiveId || !db.sequences.some(s => s.id === db.sequenceActiveId)) {
+        db.sequenceActiveId = db.sequences[0].id;
+      }
+
       render();
     };
 
-    function saveState() {
-      localStorage.setItem('badminton_atp_prof_data', JSON.stringify(state));
+    function saveDB() {
+      localStorage.setItem('badminton_atp_multiseq_data', JSON.stringify(db));
       render();
     }
 
-    function charger30ElevesParDefaut() {
-      state.eleves = [];
+    function getSeqActive() {
+      return db.sequences.find(s => s.id === db.sequenceActiveId) || db.sequences[0];
+    }
+
+    function generer30Eleves(seq) {
+      seq.eleves = [];
       for (let i = 1; i <= 30; i++) {
-        state.eleves.push({
-          id: i,
+        seq.eleves.push({
+          id: Date.now() + i,
           nom: `Élève ${i}`,
           points: 1000,
           joues: 0,
@@ -251,9 +279,66 @@
           pap: false
         });
       }
-      state.terrains = Array(12).fill(null);
-      state.historique = [];
-      saveState();
+      seq.terrains = Array(12).fill(null);
+      seq.historique = [];
+    }
+
+    function charger30ElevesParDefaut() {
+      const seq = getSeqActive();
+      if (confirm(`Générer 30 élèves par défaut pour "${seq.nom}" ? (Attention, cela réinitialisera les données de cette séquence)`)) {
+        generer30Eleves(seq);
+        saveDB();
+      }
+    }
+
+    function changerSequence(idSeq) {
+      db.sequenceActiveId = idSeq;
+      saveDB();
+    }
+
+    function creerNouvelleSequence() {
+      const nom = prompt("Nom de la nouvelle classe ou séquence (ex: Tennis de table 5ème, Combat 3ème...) :");
+      if (!nom || nom.trim() === "") return;
+
+      const nouvelleSeq = {
+        id: 'seq_' + Date.now(),
+        nom: nom.trim(),
+        eleves: [],
+        terrains: Array(12).fill(null),
+        historique: []
+      };
+
+      // Créer 30 élèves par défaut pour démarrer vite
+      for (let i = 1; i <= 30; i++) {
+        nouvelleSeq.eleves.push({
+          id: Date.now() + i,
+          nom: `Élève ${i}`,
+          points: 1000,
+          joues: 0,
+          victoires: 0,
+          defaites: 0,
+          arbitrages: 0,
+          challengesTentes: 0,
+          pap: false
+        });
+      }
+
+      db.sequences.push(nouvelleSeq);
+      db.sequenceActiveId = nouvelleSeq.id;
+      saveDB();
+    }
+
+    function supprimerSequenceActuelle() {
+      if (db.sequences.length <= 1) {
+        alert("Vous ne pouvez pas supprimer la dernière séquence active.");
+        return;
+      }
+      const seq = getSeqActive();
+      if (confirm(`Voulez-vous vraiment supprimer définitivement la séquence "${seq.nom}" et toutes ses données ?`)) {
+        db.sequences = db.sequences.filter(s => s.id !== seq.id);
+        db.sequenceActiveId = db.sequences[0].id;
+        saveDB();
+      }
     }
 
     function switchTab(tabId) {
@@ -277,47 +362,69 @@
       return { gainA_si_Victoire, perteA_si_Defaite };
     }
 
-    function estEleveOccupe(idEleve) {
-      return state.terrains.some(t => t !== null && (t.j1Id === idEleve || t.j2Id === idEleve || t.arbId === idEleve));
+    function estEleveOccupe(seq, idEleve) {
+      return seq.terrains.some(t => t !== null && (t.j1Id === idEleve || t.j2Id === idEleve || t.arbId === idEleve));
     }
 
     function render() {
-      const matchsEnCoursCount = state.terrains.filter(t => t !== null).length;
-      document.getElementById('stats-summary').innerText = `${state.eleves.length} élèves • ${matchsEnCoursCount} match(s) en cours`;
+      const seq = getSeqActive();
+
+      // 0. Mise à jour du header de la séquence
+      document.getElementById('titre-sequence-actif').innerText = seq.nom;
+      const selSeq = document.getElementById('select-sequence');
+      selSeq.innerHTML = '';
+      db.sequences.forEach(s => {
+        selSeq.innerHTML += `<option value="${s.id}" ${s.id === seq.id ? 'selected' : ''}>📁 ${s.nom}</option>`;
+      });
+
+      const matchsEnCoursCount = seq.terrains.filter(t => t !== null).length;
+      document.getElementById('stats-summary').innerText = `${seq.eleves.length} élèves • ${matchsEnCoursCount} match(s) en cours`;
 
       // 1. Remplir sélecteur terrains libres
       const selectT = document.getElementById('lancer-terrain');
       selectT.innerHTML = '';
-      state.terrains.forEach((t, index) => {
+      seq.terrains.forEach((t, index) => {
         const num = index + 1;
         const status = t ? '🔴 Occupé' : '🟢 Libre';
         selectT.innerHTML += `<option value="${index}" ${t ? 'disabled' : ''}>Terrain ${num} (${status})</option>`;
       });
 
-      // 2. Remplir sélecteurs élèves (exclure ceux qui jouent déjà)
+      // 2. Remplir sélecteurs élèves (avec exclusion)
       const selJ1 = document.getElementById('lancer-j1');
       const selJ2 = document.getElementById('lancer-j2');
       const selArb = document.getElementById('lancer-arb');
 
-      const vJ1 = selJ1.value; const vJ2 = selJ2.value; const vArb = selArb.value;
+      const valJ1 = parseInt(selJ1.value) || '';
+      const valJ2 = parseInt(selJ2.value) || '';
+      const valArb = parseInt(selArb.value) || '';
 
-      let optionsHTML = '<option value="">-- Choisir --</option>';
-      const elevesTries = [...state.eleves].sort((a, b) => a.nom.localeCompare(b.nom));
+      const elevesTries = [...seq.eleves].sort((a, b) => a.nom.localeCompare(b.nom));
 
-      elevesTries.forEach(e => {
-        const occupe = estEleveOccupe(e.id);
-        const labelOccupe = occupe ? ' (En Match/Arb)' : '';
-        optionsHTML += `<option value="${e.id}" ${occupe ? 'disabled' : ''}>${e.nom} [${e.points} pts]${labelOccupe}</option>`;
-      });
+      function buildOptions(selectedVal, excludeList) {
+        let html = '<option value="">-- Choisir --</option>';
+        elevesTries.forEach(e => {
+          const occupeTerrain = estEleveOccupe(seq, e.id);
+          const estExcluParFormulaire = excludeList.includes(e.id);
+          const isDisabled = occupeTerrain || estExcluParFormulaire;
+          
+          let badge = '';
+          if (occupeTerrain) badge = ' (En Match/Arb)';
+          else if (estExcluParFormulaire) badge = ' (Sélectionné)';
 
-      selJ1.innerHTML = optionsHTML; selJ2.innerHTML = optionsHTML; selArb.innerHTML = optionsHTML;
-      selJ1.value = vJ1; selJ2.value = vJ2; selArb.value = vArb;
+          html += `<option value="${e.id}" ${isDisabled ? 'disabled' : ''} ${e.id === selectedVal ? 'selected' : ''}>${e.nom} [${e.points} pts]${badge}</option>`;
+        });
+        return html;
+      }
+
+      selJ1.innerHTML = buildOptions(valJ1, [valJ2, valArb]);
+      selJ2.innerHTML = buildOptions(valJ2, [valJ1, valArb]);
+      selArb.innerHTML = buildOptions(valArb, [valJ1, valJ2]);
 
       // 3. Render Grille Terrains (12 Terrains PROF)
       const grille = document.getElementById('grille-terrains');
       grille.innerHTML = '';
 
-      state.terrains.forEach((t, idx) => {
+      seq.terrains.forEach((t, idx) => {
         const numT = idx + 1;
         const card = document.createElement('div');
 
@@ -376,7 +483,7 @@
       // 4. Render Suivi Challenges
       const tbodyC = document.getElementById('table-challenges');
       tbodyC.innerHTML = '';
-      [...state.eleves].sort((a, b) => b.challengesTentes - a.challengesTentes).forEach(e => {
+      [...seq.eleves].sort((a, b) => b.challengesTentes - a.challengesTentes).forEach(e => {
         const tr = document.createElement('tr');
         tr.className = 'border-b border-slate-700/50';
         tr.innerHTML = `
@@ -393,7 +500,7 @@
       // 5. Render Classement ATP
       const tbodyATP = document.getElementById('table-classement');
       tbodyATP.innerHTML = '';
-      [...state.eleves].sort((a, b) => b.points - a.points).forEach((e, idx) => {
+      [...seq.eleves].sort((a, b) => b.points - a.points).forEach((e, idx) => {
         const tr = document.createElement('tr');
         tr.className = idx % 2 === 0 ? 'bg-slate-800/50' : 'bg-slate-800';
         tr.innerHTML = `
@@ -409,7 +516,7 @@
       // 6. Render Gestion élèves
       const gridE = document.getElementById('liste-eleves-grid');
       gridE.innerHTML = '';
-      state.eleves.forEach(e => {
+      seq.eleves.forEach(e => {
         const card = document.createElement('div');
         card.className = 'bg-slate-900 p-2.5 rounded-lg border border-slate-700 flex justify-between items-center text-xs';
         card.innerHTML = `
@@ -422,13 +529,13 @@
         gridE.appendChild(card);
       });
 
-      // 7. Render Historique
+      // 7. Render Historique avec suppression sélective
       const ulH = document.getElementById('liste-historique');
-      if (state.historique.length === 0) {
+      if (seq.historique.length === 0) {
         ulH.innerHTML = '<li class="text-slate-500 text-center py-4">Aucun match enregistré.</li>';
       } else {
         ulH.innerHTML = '';
-        [...state.historique].reverse().forEach(h => {
+        [...seq.historique].reverse().forEach(h => {
           const li = document.createElement('li');
           li.className = 'bg-slate-900 p-3 rounded border border-slate-700 flex justify-between items-center text-xs';
           li.innerHTML = `
@@ -436,8 +543,11 @@
               <span class="font-bold ${h.scoreJ1 > h.scoreJ2 ? 'text-emerald-400' : 'text-slate-300'}">${h.j1Nom} (${h.scoreJ1}) [${h.diffJ1 >= 0 ? '+' : ''}${h.diffJ1}]</span>
               <span class="text-slate-500 px-2">vs</span>
               <span class="font-bold ${h.scoreJ2 > h.scoreJ1 ? 'text-emerald-400' : 'text-slate-300'}">${h.j2Nom} (${h.scoreJ2}) [${h.diffJ2 >= 0 ? '+' : ''}${h.diffJ2}]</span>
+              <span class="text-slate-400 ml-3">Arbitre : <span class="text-sky-300">${h.arbNom} (+5)</span></span>
             </div>
-            <div class="text-slate-400">Arbitre : <span class="text-sky-300">${h.arbNom} (+5)</span></div>
+            <button onclick="supprimerMatchHistorique(${h.id})" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1 rounded text-xs font-semibold transition" title="Supprimer ce match et recalculer">
+              🗑️ Supprimer
+            </button>
           `;
           ulH.appendChild(li);
         });
@@ -445,12 +555,13 @@
     }
 
     function actualiserEnjeuxLancement() {
+      const seq = getSeqActive();
       const idJ1 = parseInt(document.getElementById('lancer-j1').value);
       const idJ2 = parseInt(document.getElementById('lancer-j2').value);
       const prev = document.getElementById('previsu-enjeu');
 
-      const j1 = state.eleves.find(e => e.id === idJ1);
-      const j2 = state.eleves.find(e => e.id === idJ2);
+      const j1 = seq.eleves.find(e => e.id === idJ1);
+      const j2 = seq.eleves.find(e => e.id === idJ2);
 
       if (j1 && j2 && idJ1 !== idJ2) {
         prev.classList.remove('hidden');
@@ -467,9 +578,11 @@
       } else {
         prev.classList.add('hidden');
       }
+      render();
     }
 
     function lancerMatchSurTerrain() {
+      const seq = getSeqActive();
       const idxT = parseInt(document.getElementById('lancer-terrain').value);
       const idJ1 = parseInt(document.getElementById('lancer-j1').value);
       const idJ2 = parseInt(document.getElementById('lancer-j2').value);
@@ -484,17 +597,16 @@
         return;
       }
 
-      const j1 = state.eleves.find(e => e.id === idJ1);
-      const j2 = state.eleves.find(e => e.id === idJ2);
-      const arb = state.eleves.find(e => e.id === idArb);
+      const j1 = seq.eleves.find(e => e.id === idJ1);
+      const j2 = seq.eleves.find(e => e.id === idJ2);
+      const arb = seq.eleves.find(e => e.id === idArb);
 
-      state.terrains[idxT] = {
+      seq.terrains[idxT] = {
         j1Id: j1.id, j1Nom: j1.nom, j1Pts: j1.points,
         j2Id: j2.id, j2Nom: j2.nom, j2Pts: j2.points,
         arbId: arb.id, arbNom: arb.nom
       };
 
-      // Compter s'il s'agit d'un défi (écart > 80 pts pour le moins bien classé)
       if (j1.points <= j2.points - 80) j1.challengesTentes++;
       if (j2.points <= j1.points - 80) j2.challengesTentes++;
 
@@ -502,29 +614,29 @@
       document.getElementById('lancer-j2').value = '';
       document.getElementById('lancer-arb').value = '';
 
-      saveState();
+      saveDB();
     }
 
     function validerScoreTerrain(idxTerrain) {
-      const t = state.terrains[idxTerrain];
+      const seq = getSeqActive();
+      const t = seq.terrains[idxTerrain];
       if (!t) return;
 
       const score1 = parseInt(document.getElementById(`score-j1-${idxTerrain}`).value);
       const score2 = parseInt(document.getElementById(`score-j2-${idxTerrain}`).value);
 
       if (isNaN(score1) || isNaN(score2)) {
-        alert("Veuillez entrer le score pour les deux joueurs (ex: 10 - 8).");
+        alert("Veuillez entrer le score pour les deux joueurs.");
         return;
       }
-
       if (score1 === score2) {
-        alert("Pas de match nul possible au badminton (format 10 points).");
+        alert("Pas de match nul possible (format 10 points).");
         return;
       }
 
-      const j1 = state.eleves.find(e => e.id === t.j1Id);
-      const j2 = state.eleves.find(e => e.id === t.j2Id);
-      const arb = state.eleves.find(e => e.id === t.arbId);
+      const j1 = seq.eleves.find(e => e.id === t.j1Id);
+      const j2 = seq.eleves.find(e => e.id === t.j2Id);
+      const arb = seq.eleves.find(e => e.id === t.arbId);
 
       const elo1 = calculerEloGain(j1.points, j2.points);
       const elo2 = calculerEloGain(j2.points, j1.points);
@@ -551,26 +663,70 @@
       arb.arbitrages++;
       arb.points += 5;
 
-      state.historique.push({
+      seq.historique.push({
         id: Date.now(),
         j1Nom: j1.nom, j1Id: j1.id, scoreJ1: score1, diffJ1,
         j2Nom: j2.nom, j2Id: j2.id, scoreJ2: score2, diffJ2,
         arbNom: arb.nom, arbId: arb.id
       });
 
-      // Libérer le terrain
-      state.terrains[idxTerrain] = null;
-      saveState();
+      seq.terrains[idxTerrain] = null;
+      saveDB();
     }
 
     function annulerMatchTerrain(idxTerrain) {
+      const seq = getSeqActive();
       if (confirm("Annuler le match en cours sur ce terrain sans enregistrer les scores ?")) {
-        state.terrains[idxTerrain] = null;
-        saveState();
+        seq.terrains[idxTerrain] = null;
+        saveDB();
+      }
+    }
+
+    function supprimerMatchHistorique(matchId) {
+      const seq = getSeqActive();
+      const matchIndex = seq.historique.findIndex(h => h.id === matchId);
+      if (matchIndex === -1) return;
+
+      if (confirm("Voulez-vous supprimer ce match de l'historique ? Les points et statistiques des joueurs concernés seront annulés/recalculés.")) {
+        const last = seq.historique[matchIndex];
+        const j1 = seq.eleves.find(e => e.id === last.j1Id);
+        const j2 = seq.eleves.find(e => e.id === last.j2Id);
+        const arb = seq.eleves.find(e => e.id === last.arbId);
+
+        if (j1) {
+          j1.points -= last.diffJ1; j1.joues--;
+          if (last.scoreJ1 > last.scoreJ2) j1.victoires--; else j1.defaites--;
+        }
+        if (j2) {
+          j2.points -= last.diffJ2; j2.joues--;
+          if (last.scoreJ2 > last.scoreJ1) j2.victoires--; else j2.defaites--;
+        }
+        if (arb) { arb.arbitrages--; arb.points -= 5; }
+
+        seq.historique.splice(matchIndex, 1);
+        saveDB();
+      }
+    }
+
+    function resetStatsSequence() {
+      const seq = getSeqActive();
+      if (confirm(`Remettre tous les scores à 1000 pts et effacer l'historique de la séquence "${seq.nom}" ?`)) {
+        seq.eleves.forEach(e => {
+          e.points = 1000;
+          e.joues = 0;
+          e.victoires = 0;
+          e.defaites = 0;
+          e.arbitrages = 0;
+          e.challengesTentes = 0;
+        });
+        seq.terrains = Array(12).fill(null);
+        seq.historique = [];
+        saveDB();
       }
     }
 
     function importerListeExcel() {
+      const seq = getSeqActive();
       const texte = document.getElementById('input-import-eleves').value.trim();
       if (!texte) return;
       let lignes = texte.split(/\r?\n/);
@@ -583,8 +739,8 @@
         });
       });
 
-      if (confirm(`Remplacer par les ${nouveauxNoms.length} nouveaux élèves ?`)) {
-        state.eleves = nouveauxNoms.map((nom, idx) => ({
+      if (confirm(`Remplacer la liste de "${seq.nom}" par les ${nouveauxNoms.length} nouveaux élèves ?`)) {
+        seq.eleves = nouveauxNoms.map((nom, idx) => ({
           id: Date.now() + idx,
           nom,
           points: 1000,
@@ -595,48 +751,29 @@
           challengesTentes: 0,
           pap: false
         }));
-        state.terrains = Array(12).fill(null);
-        state.historique = [];
-        saveState();
+        seq.terrains = Array(12).fill(null);
+        seq.historique = [];
+        saveDB();
       }
     }
 
     function modifierNom(id, newNom) {
-      const e = state.eleves.find(el => el.id === id);
-      if (e) { e.nom = newNom; saveState(); }
+      const seq = getSeqActive();
+      const e = seq.eleves.find(el => el.id === id);
+      if (e) { e.nom = newNom; saveDB(); }
     }
 
     function togglePAP(id) {
-      const e = state.eleves.find(el => el.id === id);
-      if (e) { e.pap = !e.pap; saveState(); }
-    }
-
-    function annulerDernierMatch() {
-      if (state.historique.length === 0) return;
-      if (confirm("Annuler le dernier match de l'historique ?")) {
-        const last = state.historique.pop();
-        const j1 = state.eleves.find(e => e.id === last.j1Id);
-        const j2 = state.eleves.find(e => e.id === last.j2Id);
-        const arb = state.eleves.find(e => e.id === last.arbId);
-
-        if (j1) {
-          j1.points -= last.diffJ1; j1.joues--;
-          if (last.scoreJ1 > last.scoreJ2) j1.victoires--; else j1.defaites--;
-        }
-        if (j2) {
-          j2.points -= last.diffJ2; j2.joues--;
-          if (last.scoreJ2 > last.scoreJ1) j2.victoires--; else j2.defaites--;
-        }
-        if (arb) { arb.arbitrages--; arb.points -= 5; }
-        saveState();
-      }
+      const seq = getSeqActive();
+      const e = seq.eleves.find(el => el.id === id);
+      if (e) { e.pap = !e.pap; saveDB(); }
     }
 
     function exporterDonnees() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
       const a = document.createElement('a');
       a.setAttribute("href", dataStr);
-      a.setAttribute("download", `badminton_prof_export.json`);
+      a.setAttribute("download", `atp_eps_multiseq_export.json`);
       document.body.appendChild(a);
       a.click(); a.remove();
     }
